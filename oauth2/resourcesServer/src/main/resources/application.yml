@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: 'resourceServer'
+
+server:
+  port: 8090
