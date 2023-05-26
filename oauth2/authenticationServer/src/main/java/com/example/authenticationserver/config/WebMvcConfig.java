@@ -1,2 +1,16 @@
-package com.example.authenticationserver.config;public class WebMvcConfig {
+package com.example.authenticationserver.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebMvcConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+
+//        registry.addViewController("/api/members/login")
+//                .setViewName("login");
+    }
 }

@@ -10,6 +10,9 @@ server:
 spring:
   thymeleaf:
     cache: false
+    check-template-location: true
+    prefix: classpath:/templates/
+    suffix: .html
   datasource:
     driver-class-name: 'com.mysql.cj.jdbc.Driver'
     url: jdbc:mysql://localhost:3306/security?serverTimezone=Asia/Seoul
