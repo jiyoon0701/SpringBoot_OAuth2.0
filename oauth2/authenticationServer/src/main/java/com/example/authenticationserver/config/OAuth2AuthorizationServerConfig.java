@@ -60,7 +60,6 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                     PrintWriter writer = response.getWriter();
                     writer.println(new AccessDeniedException("access denied !"));
                 });
-
     }
 
     /**
@@ -79,7 +78,12 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
 
     /**
      * 이 설정은 Authorization Server 설정의 전부라고 해도 무방할 정도로 중요한 설정 메소드이다.
-     * Authorize, Token 발급, Token Check할때의 행동을 정의하는 설정들이 들어간다.
+     * Authorize, Token 발급, Token Check할 때의 행동을 정의하는 설정들이 들어간다.
+     * Authorization Endpoint: /oauth/authorize
+     * Token Endpoint: /oauth/token
+     * Approval Endpoint: /oauth/confirm_access
+     * Check Token Endpoint: /oauth/check_token
+     * JWT Sign key Endpoint: /oauth/token_key
      * */
 
     @Override

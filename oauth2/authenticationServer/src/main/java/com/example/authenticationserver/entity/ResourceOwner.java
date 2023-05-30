@@ -20,7 +20,7 @@ public class ResourceOwner implements UserDetails {
 
     private String username;
 
-    private String useremail;
+    private String nickname;
 
     @Column(length=400)
     private String password;

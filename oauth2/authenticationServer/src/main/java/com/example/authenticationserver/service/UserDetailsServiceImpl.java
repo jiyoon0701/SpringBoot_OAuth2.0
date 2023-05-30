@@ -21,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         log.info("UserDetailsServiceImpl.loadUserByUsername :::: {}",username);
 
-        ResourceOwner user = repository.findByUseremail(username);
+        ResourceOwner user = repository.findByUsername(username);
 
         if(ObjectUtils.isEmpty(user)){
             throw new UsernameNotFoundException("Invalid resource owner, please check resource owner info !");

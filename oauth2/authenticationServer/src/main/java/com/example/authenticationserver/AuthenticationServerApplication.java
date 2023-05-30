@@ -10,9 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
-public class AuthenticationServerApplication implements CommandLineRunner {
-    @Autowired
-    private ResourceOwnerRepository repository;
+public class AuthenticationServerApplication  {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -20,14 +18,4 @@ public class AuthenticationServerApplication implements CommandLineRunner {
         SpringApplication.run(AuthenticationServerApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        ResourceOwner user = new ResourceOwner();
-        user.setUsername("test");
-        user.setUseremail("test@test.com");
-        user.setPassword(passwordEncoder.encode("password"));
-        user.setRole(UserRole.ROLE_USER);
-
-        repository.save(user);
-    }
 }

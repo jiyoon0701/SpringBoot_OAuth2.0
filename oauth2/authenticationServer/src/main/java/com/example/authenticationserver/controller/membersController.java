@@ -38,7 +38,7 @@ public class membersController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRole.ROLE_USER);
 
-        ResourceOwner owner = repository.findByUseremail(user.getUsername());
+        ResourceOwner owner = repository.findByUsername(user.getUsername());
         if(ObjectUtils.isEmpty(owner)){
             repository.save(user);
         }
