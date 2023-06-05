@@ -18,9 +18,10 @@
     </properties>
     <packaging>pom</packaging>
     <modules>
-        <module>authenticationServer</module>
+        <module>authServer-code</module>
         <module>resourcesServer</module>
         <module>clientServer</module>
+        <module>authServer-password</module>
     </modules>
     <dependencies>
         <dependency>
