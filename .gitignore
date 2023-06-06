@@ -1,14 +1,18 @@
 
 .idea/
 
-oauth2/authenticationServer/.mvn/wrapper/
+oauth2/authServer-code/.mvn/wrapper/
 
 oauth2/clientServer/.mvn/wrapper/
 
 oauth2/resourcesServer/.mvn/wrapper/
 
-oauth2/authenticationServer/target
+oauth2/authServer-code/target
 
 oauth2/clientServer/target
 
 oauth2/resourcesServer/target
+
+oauth2/clientServer/src/main/resources/static
+
+oauth2/authServer-code/src/main/resources/static
