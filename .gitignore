@@ -16,3 +16,4 @@ oauth2/resourcesServer/target
 oauth2/clientServer/src/main/resources/static
 
 oauth2/authServer-code/src/main/resources/static
+oauth2/clientServer/clientServer.iml
