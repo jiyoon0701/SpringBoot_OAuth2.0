@@ -7,8 +7,8 @@
 <mapper namespace="com.example.authServerPassword.mapper.memberMapper">
 
  	<insert id="save">
-   		insert into resouceOwner (name, password) values
- 		(#{name}, #{password})
+   		insert into resouceOwner (id, username, password, role) values
+ 		(#{id}, #{username}, #{password}, #{role})
      </insert>
 
      <select id="selectAll" resultType="com.example.authServerPassword.Domain.ResourceOwner">

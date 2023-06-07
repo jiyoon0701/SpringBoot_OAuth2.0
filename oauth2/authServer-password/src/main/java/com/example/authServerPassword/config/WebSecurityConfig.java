@@ -80,10 +80,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 })
                 .and()
                 .formLogin()
-                .loginPage("/login.html")
+                .loginPage("/login.jsp")
                 .usernameParameter("username")//아이디 파라미터명 설정
                 .passwordParameter("password")//패스워드 파라미터명 설정
-                .loginProcessingUrl("/login")//로그인 Form Action Url
+                .loginProcessingUrl("/api/members/login")//로그인 Form Action Url
                 .successHandler(authenticationSuccessHandler())
                 .failureHandler(authenticationFailureHandler())
         ;

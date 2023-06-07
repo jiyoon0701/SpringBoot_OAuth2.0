@@ -75,11 +75,11 @@ public class clientsController {
     public ModelAndView remove(
             @RequestParam(value = "client_id", required = false) String clientId) {
 
-        clientRegistrationService.removeClientDetails(clientId);
+      clientRegistrationService.removeClientDetails(clientId);
 
         ModelAndView mv = new ModelAndView("redirect:/api/client/dashboard");
         mv.addObject("applications",
-                clientRegistrationService.listClientDetails());
+        clientRegistrationService.listClientDetails());
         return mv;
     }
 }

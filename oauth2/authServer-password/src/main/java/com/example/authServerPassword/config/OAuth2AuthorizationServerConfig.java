@@ -1,6 +1,8 @@
 package com.example.authServerPassword.config;
 
+// import com.example.authServerPassword.Service.ClientDetailsServiceImpl;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,7 @@ import org.springframework.security.oauth2.provider.client.JdbcClientDetailsServ
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import sun.rmi.runtime.Log;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -35,8 +38,9 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
      * 모든 메서드를 포함한 구현체 -> AuthorizationServerConfigurerAdapter이기 때문에 상속을 받으면 편리하다.
      */
 
+
     @Autowired private DataSource dataSource ;
-    @Autowired@Qualifier("clientDetailsServiceImpl") private ClientDetailsService clientDetailsService;
+    @Autowired@Qualifier("clientDetailsServiceImpl") ClientDetailsService clientDetailsService;
     @Autowired private UserDetailsService userDetailsService;
 
     /**
@@ -75,7 +79,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
          * userDetailsService는 spring Security에서 유저의 정보를 가져오는 인터페이스이다.
          *
          * */
-        clients.withClientDetails(clientDetailsService);
+      clients.withClientDetails(clientDetailsService);
     }
 
     /**
