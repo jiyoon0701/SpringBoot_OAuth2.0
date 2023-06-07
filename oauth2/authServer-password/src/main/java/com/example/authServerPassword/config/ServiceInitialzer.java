@@ -30,7 +30,7 @@ public class ServiceInitialzer implements WebApplicationInitializer {
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher",
                 new DispatcherServlet(applicationContext));
         dispatcher.setLoadOnStartup(1);
-       // dispatcher.addMapping("/");
+        dispatcher.addMapping("/");
     }
 
     private void addUtf8CharacterEncodingFilter(ServletContext servletContext) {

@@ -20,7 +20,7 @@ public class DataBaseConfig {
 
     private String username = "root";
 
-    private String password = "1234";
+    private String password = "root";
 
     @Bean
     public DataSource dataSource() {

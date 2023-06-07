@@ -15,9 +15,9 @@ import javax.sql.DataSource;
 public class MybatisConfig {
     @Bean
     @Autowired
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource2) throws Exception{
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception{
         SqlSessionFactoryBean sb = new SqlSessionFactoryBean();
-        sb.setDataSource(dataSource2);
+        sb.setDataSource(dataSource);
         sb.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:/mappers/*.xml"));
         //sb.setConfigLocation(new DefaultResourceLoader().getResource("classpath:config_mybatis.xml"));
         return sb.getObject();
@@ -30,20 +30,4 @@ public class MybatisConfig {
         return s;
     }
 
-    @Bean
-    @Autowired
-    public SqlSessionFactory sqlSessionFactory2(DataSource dataSource2) throws Exception{
-        SqlSessionFactoryBean sb = new SqlSessionFactoryBean();
-        sb.setDataSource(dataSource2);
-        sb.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:/mappers/*.xml"));
-        //sb.setConfigLocation(new DefaultResourceLoader().getResource("classpath:config_mybatis.xml"));
-        return sb.getObject();
-    }
-
-    @Bean
-    @Autowired
-    public SqlSessionTemplate sqlSession2(SqlSessionFactory sqlSessionFactory2){
-        SqlSessionTemplate s = new SqlSessionTemplate(sqlSessionFactory2);
-        return s;
-    }
 }

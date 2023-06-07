@@ -21,8 +21,6 @@ import org.springframework.security.oauth2.provider.client.JdbcClientDetailsServ
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import sun.rmi.runtime.Log;
-
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 
@@ -37,7 +35,6 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     /**
      * 모든 메서드를 포함한 구현체 -> AuthorizationServerConfigurerAdapter이기 때문에 상속을 받으면 편리하다.
      */
-
 
     @Autowired private DataSource dataSource ;
     @Autowired@Qualifier("clientDetailsServiceImpl") ClientDetailsService clientDetailsService;

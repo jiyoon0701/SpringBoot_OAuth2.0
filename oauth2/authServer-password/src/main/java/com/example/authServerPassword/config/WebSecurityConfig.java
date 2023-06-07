@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -39,10 +40,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * AuthenticationManager 빈 생성 시 스프링의 내부 동작으로 인해 UserSecurityService와 PasswordEncoder가 자동으로 설정된다.
      */
-    @Bean
-    AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+//    @Bean
+//    AuthenticationManager authenticationManager(
+//            AuthenticationConfiguration authenticationConfiguration) throws Exception {
+//        return authenticationConfiguration.getAuthenticationManager();
+//    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        // 사용자 인증 정보를 설정합니다.
+        // ...
+
     }
 
     @Override
@@ -65,7 +73,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/members/login", "/api/members/register").permitAll()
+                .antMatchers("/api/members/login", "/api/members/register", "/oauth/token").permitAll()
                 .antMatchers("/error**").permitAll()
                 .anyRequest().authenticated()
                 .and().csrf()

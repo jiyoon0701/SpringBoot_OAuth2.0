@@ -14,7 +14,7 @@ import org.springframework.util.ObjectUtils;
 
 @Slf4j
 @Component
-@Service
+@Service("UserDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired private MemberService service;

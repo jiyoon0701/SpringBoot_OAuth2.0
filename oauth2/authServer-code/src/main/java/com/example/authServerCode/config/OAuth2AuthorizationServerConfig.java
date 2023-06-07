@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -36,9 +38,11 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
      */
 
     @Autowired private DataSource dataSource;
+
+    @Autowired AuthenticationManager authenticationManager;
     @Autowired@Qualifier("clientDetailsServiceImpl") private ClientDetailsService clientDetailsService;
     @Autowired private UserDetailsService userDetailsService;
-
+    @Autowired private PasswordEncoder passwordEncoder;
     /**
      * AuthorizationServerSecurityConfigurer를 매개변수로 가진 설정 코드
      * 해당 메소드에서 설정하는 것은 AuthenticationEntryPoint, AccessDeniedHandler, PasswordEncoder등을 설정할 수 있는 메소드
@@ -69,13 +73,19 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        /*
+        /*ClientDetailsServiceConfigurer
          * 클라이언트를 db에서 관리하기 위하여 DataSource 주입
          * UserDetailsService와 동일한 역할을 하는 객체
          * userDetailsService는 spring Security에서 유저의 정보를 가져오는 인터페이스이다.
          *
          * */
         clients.withClientDetails(clientDetailsService);
+       // clients.jdbc(dataSource);
+//        clients.jdbc(dataSource)
+//                .withClient("2bf010e6-bc89-4a7b-8b1c-6c98efaca764")
+//                .secret(passwordEncoder.encode("f1b3ad4c-fe0a-438e-bf67-f53e9e00768e"))
+//                .authorizedGrantTypes("password")
+//                .scopes("read");
     }
 
     /**
@@ -92,6 +102,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 
         endpoints
+                .authenticationManager(authenticationManager)
                 .userDetailsService(userDetailsService) //refresh token 발급을 위해서는 UserDetailsService(AuthenticationManager authenticate()에서 사용)필요
                 .authorizationCodeServices(new JdbcAuthorizationCodeServices(dataSource))
                 // 1. authorization code를 DB로 관리 코드 테이블의 authentication은 blob데이터타입으로..
@@ -100,6 +111,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                 // 1. resource owner가 client app이 resource server에 있는 resource owner의 리소스의 사용을 허락한다는 데이터를 담은 approvalStore를 설정해주는 것
                 .tokenStore(tokenStore()) //토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의
                 .accessTokenConverter(accessTokenConverter());
+
     }
     @Bean
     public JwtTokenStore tokenStore() {
