@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 
 @Configuration
-@ComponentScan({"com.example.authServerPassword.Service", "com.example.authServerPassword.Persistence"})
+@ComponentScan({"com.example.authServerPassword.Service", "com.example.authServerPassword.Persistence", "com.example.authServerPassword.config"})
 public class RootAppContext {
 //    @Bean
 //    public DataSource dataSource() {

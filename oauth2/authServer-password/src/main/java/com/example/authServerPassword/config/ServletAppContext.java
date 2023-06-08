@@ -12,7 +12,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan({"com.example.authServerPassword.Controller"})
+@ComponentScan({"com.example.authServerPassword"})
 public class ServletAppContext extends WebMvcConfigurerAdapter{
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry){

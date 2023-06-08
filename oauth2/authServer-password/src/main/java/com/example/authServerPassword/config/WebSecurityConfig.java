@@ -7,12 +7,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -40,17 +42,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * AuthenticationManager 빈 생성 시 스프링의 내부 동작으로 인해 UserSecurityService와 PasswordEncoder가 자동으로 설정된다.
      */
-    @Bean
-    AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
-//    @Override
 //    @Bean
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
+//    AuthenticationManager authenticationManager(
+//            AuthenticationConfiguration authenticationConfiguration) throws Exception {
+//        return authenticationConfiguration.getAuthenticationManager();
 //    }
+
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -66,7 +68,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        User.UserBuilder users = User.withDefaultPasswordEncoder();
+    }
+
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
 
         http
                 .cors()

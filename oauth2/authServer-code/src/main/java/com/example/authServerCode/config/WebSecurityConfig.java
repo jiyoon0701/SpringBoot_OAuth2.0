@@ -1,4 +1,4 @@
-package com.example.config;
+package com.example.authServerCode.config;
 
 import com.example.authServerCode.security.CustomAuthenticationFailureHandler;
 import com.example.authServerCode.security.CustomAuthenticationSuccessHandler;

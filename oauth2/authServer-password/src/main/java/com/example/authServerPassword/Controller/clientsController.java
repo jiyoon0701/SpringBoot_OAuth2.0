@@ -5,6 +5,7 @@ import com.example.authServerPassword.Domain.ClientDto;
 import com.example.authServerPassword.Service.ClientDetailsServiceImpl;
 import com.example.authServerPassword.constrant.ClientType;
 import com.example.authServerPassword.utils.Crypto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;

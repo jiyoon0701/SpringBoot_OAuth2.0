@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 import java.util.List;
 
+@Service
 @Primary
 @Slf4j
-@Service
 public class ClientDetailsServiceImpl extends JdbcClientDetailsService {
     public ClientDetailsServiceImpl(DataSource dataSource) {
         super(dataSource);
