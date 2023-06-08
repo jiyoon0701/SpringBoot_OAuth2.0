@@ -32,6 +32,8 @@ public class clientsController {
     @GetMapping("/dashboard")
     public ModelAndView dashboard(@ModelAttribute("clientId")String clientId
             ,@ModelAttribute("clientSecret")String clientSecret
+             , @ModelAttribute("name")String name
+                                  ,@ModelAttribute("clientType")String clientType
             , ModelAndView mv) {
 
 
@@ -54,9 +56,12 @@ public class clientsController {
         String randomId = UUID.randomUUID().toString();
         String randomSecret = UUID.randomUUID().toString();
 
+        String name = clientDetails.getName();
+        System.out.println();
+
         Client client = new Client();
         client.addAdditionalInformation("name", clientDetails.getName());
-        client.setRegisteredRedirectUri(new HashSet<>(Arrays.asList("http://localhost:9000/callback")));
+        client.setRegisteredRedirectUri(new HashSet<>(Arrays.asList(clientDetails.getRedirectUri().toString())));
         client.setClientType(ClientType.PUBLIC);
         client.setClientId(randomId);
         client.setClientSecret(Crypto.sha256(randomSecret));
@@ -67,6 +72,8 @@ public class clientsController {
         mav.setViewName("redirect:/api/client/dashboard");
         mav.addObject("clientId", randomId);
         mav.addObject("clientSecret", randomSecret);
+        mav.addObject("name", name);
+        mav.addObject("clientType", clientDetails.getClientType());
 
         return mav;
     }

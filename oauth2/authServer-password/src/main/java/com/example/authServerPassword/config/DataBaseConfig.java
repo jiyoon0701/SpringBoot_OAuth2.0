@@ -16,11 +16,11 @@ public class DataBaseConfig {
 
     private String driver = "com.mysql.cj.jdbc.Driver";
 
-    private String url = "jdbc:mysql://127.0.0.1:3306/oauth2?allowPublicKeyRetrieval=true&amp;useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;serverTimezone=UTC";
+    private String url = "jdbc:mysql://127.0.0.1:3306/oauth2?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC";
 
     private String username = "root";
 
-    private String password = "root";
+    private String password = "1234";
 
     @Bean
     public DataSource dataSource() {

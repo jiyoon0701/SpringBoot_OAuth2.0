@@ -1,10 +1,4 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: esum
-  Date: 2023-06-07
-  Time: 오전 11:07
-  To change this template use File | Settings | File Templates.
---%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -20,20 +14,18 @@
 
   <h2>Create your application (client registration)</h2>
 
-  <form action="#"
+  <form action="/api/client/save"
         method="post">
     <div class="form-group">
       <label for="nome">Name:</label> <input class="form-control"
-                                             id="name" type="text" th:field="*{name}" />
+                                             id="name" type="text" name = "name" />
       <div>application
         name</div>
     </div>
 
     <div class="form-group">
       <label for="redirectUri">Redirect URL:</label> <input
-            class="form-control" id="redirectUri" type="text" />
-      <div >Callback URL to receive the
-        authorization code</div>
+            class="form-control" id="redirectUri" name = "redirectUri" type="text" />
     </div>
 
     <div class="form-group">
