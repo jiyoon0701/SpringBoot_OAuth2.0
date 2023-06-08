@@ -1,7 +1,7 @@
-package com.example.config;
+package com.example.authServerPassword.config;
 
-import com.example.authServerCode.security.CustomAuthenticationFailureHandler;
-import com.example.authServerCode.security.CustomAuthenticationSuccessHandler;
+import com.example.authServerPassword.security.CustomAuthenticationFailureHandler;
+import com.example.authServerPassword.security.CustomAuthenticationSuccessHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
