@@ -30,8 +30,11 @@ public class SpringConfigClass implements WebApplicationInitializer {
         servlet.addMapping("/");
 
         DelegatingFilterProxy filter = new DelegatingFilterProxy("springSecurityFilterChain");
+        DelegatingFilterProxy filter2 = new DelegatingFilterProxy("oauth2ClientContextFilter");
+        filter2.setContextAttribute("org.springframework.web.servlet.FrameworkServlet.CONTEXT.dispatcher");
         filter.setContextAttribute("org.springframework.web.servlet.FrameworkServlet.CONTEXT.dispatcher");
         servletContext.addFilter("springSecurityFilterChain", filter).addMappingForUrlPatterns(null, false, "/*");
+        servletContext.addFilter("oauth2ClientContextFilter", filter2).addMappingForUrlPatterns(null, false, "/*");
 
 
         // Bean을 정의하는 클래스를 지정

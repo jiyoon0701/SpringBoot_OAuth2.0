@@ -4,6 +4,7 @@ package com.example.authServerPassword.Controller;
 import com.example.authServerPassword.Domain.ResourceOwner;
 import com.example.authServerPassword.Service.MemberService;
 import com.example.authServerPassword.constrant.UserRole;
+import com.example.authServerPassword.utils.ShaPasswordEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +23,7 @@ public class membersController {
     private MemberService memberService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private ShaPasswordEncoder passwordEncoder;
 
     @GetMapping("/login")
     public String login() {

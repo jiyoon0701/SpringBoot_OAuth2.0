@@ -48,7 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
-    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private ShaPasswordEncoder shaPasswordEncoder;
 
     /**
      * AuthenticationProvider 인터페이스는 화면에서 입력한 로그인 정보랑 DB에서 가져온 사용자 정보를 비교해주는 인터페이스
@@ -78,10 +78,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/vendor/**")
                 .antMatchers("/js/**")
                 .antMatchers("/favicon*/**")
-                .antMatchers("/img/**")
-                .antMatchers("classpath:/static/css/")
-        ;
-    }
+            .antMatchers("/img/**")
+                .antMatchers("classpath:/static/css/");
+}
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -92,7 +91,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
+        authenticationProvider.setPasswordEncoder(shaPasswordEncoder);
 
         return authenticationProvider;
     }
@@ -136,7 +135,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordParameter("password")//패스워드 파라미터명 설정
                 .loginProcessingUrl("/login")//로그인 Form Action Url
                 .successHandler(authenticationSuccessHandler())
-                .failureHandler(authenticationFailureHandler())
+                .failureHandler(authenticationFailureHandler());
         ;
     }
 
@@ -144,7 +143,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         CustomAuthenticationSuccessHandler successHandler = new CustomAuthenticationSuccessHandler();
         successHandler.setDefaultTargetUrl("/api/client/dashboard");
-
         return successHandler;
     }
 

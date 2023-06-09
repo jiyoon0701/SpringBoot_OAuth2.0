@@ -5,8 +5,10 @@ import com.example.authServerPassword.Domain.ClientDto;
 import com.example.authServerPassword.Service.ClientDetailsServiceImpl;
 import com.example.authServerPassword.constrant.ClientType;
 import com.example.authServerPassword.utils.Crypto;
+import com.example.authServerPassword.utils.ShaPasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -23,6 +25,7 @@ import java.util.UUID;
 public class clientsController {
     @Autowired
     private ClientDetailsServiceImpl clientRegistrationService;
+    @Autowired private ShaPasswordEncoder passwordEncoder;
     @GetMapping("/register")
     public ModelAndView registerPage(ModelAndView mav) {
         mav.setViewName("client/register");
@@ -65,7 +68,8 @@ public class clientsController {
         client.setRegisteredRedirectUri(new HashSet<>(Arrays.asList(clientDetails.getRedirectUri().toString())));
         client.setClientType(ClientType.PUBLIC);
         client.setClientId(randomId);
-        client.setClientSecret(Crypto.sha256(randomSecret));
+    //    client.setClientSecret(Crypto.sha256(randomSecret));
+        client.setClientSecret(passwordEncoder.encode(randomSecret));
         client.setAccessTokenValiditySeconds(3600);
         client.setScope(Arrays.asList("read","write"));
         clientRegistrationService.addClientDetails(client);

@@ -1,6 +1,7 @@
 package com.example.authServerPassword.config;
 
 // import com.example.authServerPassword.Service.ClientDetailsServiceImpl;
+import com.example.authServerPassword.utils.ShaPasswordEncoder;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -42,6 +46,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     @Autowired@Qualifier("clientDetailsServiceImpl") ClientDetailsService clientDetailsService;
     @Autowired private UserDetailsService userDetailsService;
     @Autowired private AuthenticationManager authenticationManager;
+    @Autowired private ShaPasswordEncoder shaPasswordEncoder;
 
     /**
      * AuthorizationServerSecurityConfigurer를 매개변수로 가진 설정 코드
@@ -50,6 +55,8 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
      *
      * 토큰 엔드포인트 (/auth/token) 에 대한 보안관련 설정을 할 수 있다.
      * */
+
+
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.accessDeniedHandler((request, response, exception)->{
@@ -65,6 +72,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                     writer.println(new AccessDeniedException("access denied !"));
                 })
 
+       //         .addAuthenticationProvider(authenticationProvider())
                 .tokenKeyAccess("permitAll()")
                 .checkTokenAccess("isAuthenticated()");
     }
@@ -81,7 +89,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
          *
          * */
         //clients.jdbc().passwordEncoder()
-       clients.withClientDetails(clientDetailsService);
+        clients.withClientDetails(clientDetailsService);
         //clients.jdbc(dataSource).passwordEncoder(passwordEncoder);
     }
 
@@ -98,7 +106,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints
-                //.authenticationManager(authenticationManager)
+                .authenticationManager(authenticationManager)
                 .userDetailsService(userDetailsService) //refresh token 발급을 위해서는 UserDetailsService(AuthenticationManager authenticate()에서 사용)필요
                 .authorizationCodeServices(new JdbcAuthorizationCodeServices(dataSource))
                 // 1. authorization code를 DB로 관리 코드 테이블의 authentication은 blob데이터타입으로..
