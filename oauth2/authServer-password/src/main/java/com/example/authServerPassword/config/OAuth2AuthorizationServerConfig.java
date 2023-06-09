@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -39,6 +41,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     @Autowired private DataSource dataSource ;
     @Autowired@Qualifier("clientDetailsServiceImpl") ClientDetailsService clientDetailsService;
     @Autowired private UserDetailsService userDetailsService;
+    @Autowired private AuthenticationManager authenticationManager;
 
     /**
      * AuthorizationServerSecurityConfigurer를 매개변수로 가진 설정 코드
@@ -61,6 +64,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                     PrintWriter writer = response.getWriter();
                     writer.println(new AccessDeniedException("access denied !"));
                 })
+
                 .tokenKeyAccess("permitAll()")
                 .checkTokenAccess("isAuthenticated()");
     }
@@ -76,7 +80,9 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
          * userDetailsService는 spring Security에서 유저의 정보를 가져오는 인터페이스이다.
          *
          * */
-      clients.withClientDetails(clientDetailsService);
+        //clients.jdbc().passwordEncoder()
+       clients.withClientDetails(clientDetailsService);
+        //clients.jdbc(dataSource).passwordEncoder(passwordEncoder);
     }
 
     /**
@@ -91,8 +97,8 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-
         endpoints
+                //.authenticationManager(authenticationManager)
                 .userDetailsService(userDetailsService) //refresh token 발급을 위해서는 UserDetailsService(AuthenticationManager authenticate()에서 사용)필요
                 .authorizationCodeServices(new JdbcAuthorizationCodeServices(dataSource))
                 // 1. authorization code를 DB로 관리 코드 테이블의 authentication은 blob데이터타입으로..

@@ -1,12 +1,19 @@
 package com.example.authServerPassword.config;
 
+import com.example.authServerPassword.Service.UserDetailsServiceImpl;
 import com.example.authServerPassword.security.CustomAuthenticationFailureHandler;
 import com.example.authServerPassword.security.CustomAuthenticationSuccessHandler;
+import com.example.authServerPassword.utils.ShaPasswordEncoder;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,22 +22,33 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 
 @EnableWebSecurity // 스프링시큐리티 사용을 위한 어노테이션
 @Configuration
 @AllArgsConstructor
+@Log4j
 /**
  * WebSecurityConfigurerAdapter가 Deprecated가 되어 사용할 수 없게 됨.
  * 공식문서에 따라 SecurityFilterChain을 Bean으로 등록해서 사용
  */
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+    @Autowired private PasswordEncoder passwordEncoder;
 
     /**
      * AuthenticationProvider 인터페이스는 화면에서 입력한 로그인 정보랑 DB에서 가져온 사용자 정보를 비교해주는 인터페이스
@@ -42,18 +60,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * AuthenticationManager 빈 생성 시 스프링의 내부 동작으로 인해 UserSecurityService와 PasswordEncoder가 자동으로 설정된다.
      */
-//    @Bean
-//    AuthenticationManager authenticationManager(
-//            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-//        return authenticationConfiguration.getAuthenticationManager();
-//    }
-
-    @Override
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
+//    @Override
+//    @Bean
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
     @Override
     public void configure(WebSecurity web) throws Exception {
 
@@ -69,8 +85,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        User.UserBuilder users = User.withDefaultPasswordEncoder();
+        auth.authenticationProvider(authenticationProvider());
     }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
+
+        return authenticationProvider;
+    }
+
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("*"));
+//        configuration.setAllowedMethods(Arrays.asList("*"));
+//        configuration.setAllowedHeaders(Arrays.asList("*"));
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//
+//        return source;
+//    }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
@@ -79,7 +116,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/members/login", "/api/members/register").permitAll()
+                .antMatchers("/api/members/login", "/api/members/register","/oauth/token").permitAll()
                 .antMatchers("/error**").permitAll()
                 .anyRequest().authenticated()
                 .and().csrf()

@@ -7,13 +7,21 @@
 <mapper namespace="com.example.authServerPassword.mapper.memberMapper">
 
  	<insert id="save">
-   		insert into resouceOwner (id, username, password, role) values
+   		insert into RESOURCE_OWNER (id, username, password, role) values
  		(#{id}, #{username}, #{password}, #{role})
      </insert>
 
      <select id="selectAll" resultType="com.example.authServerPassword.Domain.ResourceOwner">
      <![CDATA[
- 		select * from resourceOwner
+ 		select * from RESOURCE_OWNER
       ]]> 
      </select>
+
+    <select id="findByUsername" resultType="com.example.authServerPassword.Domain.ResourceOwner">
+        select * from RESOURCE_OWNER where username = #{username}
+    </select>
+
+    <select id="login" resultType="com.example.authServerPassword.Domain.ResourceOwner">
+        select * from RESOURCE_OWNER where username = #{username} and password = #{password}
+    </select>
 </mapper>  

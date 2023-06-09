@@ -1,9 +1,11 @@
 package com.example.authServerPassword.config;
 
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.FilterRegistration;
@@ -26,6 +28,11 @@ public class SpringConfigClass implements WebApplicationInitializer {
         // 부가 설정
         servlet.setLoadOnStartup(1);
         servlet.addMapping("/");
+
+        DelegatingFilterProxy filter = new DelegatingFilterProxy("springSecurityFilterChain");
+        filter.setContextAttribute("org.springframework.web.servlet.FrameworkServlet.CONTEXT.dispatcher");
+        servletContext.addFilter("springSecurityFilterChain", filter).addMappingForUrlPatterns(null, false, "/*");
+
 
         // Bean을 정의하는 클래스를 지정
         AnnotationConfigWebApplicationContext rootAppContext = new AnnotationConfigWebApplicationContext();

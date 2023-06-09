@@ -10,4 +10,6 @@ public interface MemberDAO {
 	public ResourceOwner findByUsername(String username) throws Exception;
 
 
+
+
 }
