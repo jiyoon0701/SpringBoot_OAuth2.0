@@ -78,9 +78,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/vendor/**")
                 .antMatchers("/js/**")
                 .antMatchers("/favicon*/**")
-            .antMatchers("/img/**")
-                .antMatchers("classpath:/static/css/");
-}
+                .antMatchers("/img/**")
+                .antMatchers("classpath:/static/css/")
+                .antMatchers("/oauth/token")
+        ;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -115,7 +117,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/members/login", "/api/members/register","/oauth/token").permitAll()
+                .antMatchers("/api/members/login", "/api/members/register", "/oauth/token").permitAll()
                 .antMatchers("/error**").permitAll()
                 .anyRequest().authenticated()
                 .and().csrf()

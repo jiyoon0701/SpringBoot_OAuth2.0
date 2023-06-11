@@ -40,7 +40,7 @@ public class membersController {
         System.out.println("123");
         user.setId(1L);
         user.setUsername("test@test.com");
-        user.setPassword(passwordEncoder.encode("test"));
+        user.setPassword(passwordEncoder.encode("password"));
         user.setRole(UserRole.ROLE_USER);
         ResourceOwner owner = memberService.findByUsername(user.getUsername());
         if(ObjectUtils.isEmpty(owner)){
