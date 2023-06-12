@@ -1,39 +1,41 @@
 package com.example.authServerPassword.config;
 
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
-import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.ContextLoaderListener;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+
 import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.filter.DelegatingFilterProxy;
-import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
+import javax.servlet.*;
 
-public class SpringConfigClass implements WebApplicationInitializer {
+public class SpringConfigClass extends AbstractAnnotationConfigDispatcherServletInitializer {
+
     @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
-        // Spring MVC 프로젝트 설정을 위해 작성하는 클래스의 객체를 생성
-        AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext();
-        applicationContext.register(ServletAppContext.class);
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class[]{RootAppContext.class};
+    }
 
-        // 요청 발생 시 요청을 처리하는 서블릿을 DispatcherServlet으로 설정해준다.
-        DispatcherServlet dispatcherServlet = new DispatcherServlet(applicationContext);
-        ServletRegistration.Dynamic  servlet = servletContext.addServlet("dispatcherServlet", dispatcherServlet);
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class[]{ServletAppContext.class};
+    }
 
-        // 부가 설정
-        servlet.setLoadOnStartup(1);
-        servlet.addMapping("/");
+    @Override
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
+    }
 
-        DelegatingFilterProxy filter = new DelegatingFilterProxy("springSecurityFilterChain");
-        filter.setContextAttribute("org.springframework.web.servlet.FrameworkServlet.CONTEXT.dispatcher");
-        servletContext.addFilter("springSecurityFilterChain", filter).addMappingForUrlPatterns(null, false, "/*");
+    @Override
+    protected Filter[] getServletFilters() {
+        CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter();
+        encodingFilter.setEncoding("UTF-8");
+        encodingFilter.setForceEncoding(true);
 
-        // Bean을 정의하는 클래스를 지정
-        AnnotationConfigWebApplicationContext rootAppContext = new AnnotationConfigWebApplicationContext();
-        rootAppContext.register(RootAppContext.class);
+        return new Filter[]{encodingFilter};
+    }
+
+    @Override
+    protected void customizeRegistration(ServletRegistration.Dynamic registration) {
+        registration.setInitParameter("dispatchOptionsRequest", "true");
+        registration.setAsyncSupported(true);
     }
 }
+
