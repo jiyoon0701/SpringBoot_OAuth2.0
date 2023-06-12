@@ -7,7 +7,6 @@ import com.example.authServerPassword.utils.ShaPasswordEncoder;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,10 +19,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -65,11 +60,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-//    @Override
-//    @Bean
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
-//    }
     @Override
     public void configure(WebSecurity web) throws Exception {
 
@@ -80,13 +70,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/favicon*/**")
                 .antMatchers("/img/**")
                 .antMatchers("classpath:/static/css/")
-                .antMatchers("/oauth/token")
-        ;
-    }
+                .antMatchers("/**")
+;}
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(authenticationProvider());
+                auth.userDetailsService(userDetailsService)
+                .passwordEncoder(shaPasswordEncoder);
     }
 
     @Bean
@@ -98,21 +88,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return authenticationProvider;
     }
 
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(Arrays.asList("*"));
-//        configuration.setAllowedMethods(Arrays.asList("*"));
-//        configuration.setAllowedHeaders(Arrays.asList("*"));
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//
-//        return source;
-//    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-
         http
                 .cors()
                 .and()
@@ -138,7 +127,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/login")//로그인 Form Action Url
                 .successHandler(authenticationSuccessHandler())
                 .failureHandler(authenticationFailureHandler());
-        ;
     }
 
     @Bean
@@ -160,6 +148,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return new LoginUrlAuthenticationEntryPoint("/api/members/login");
     }
-
 }
 
