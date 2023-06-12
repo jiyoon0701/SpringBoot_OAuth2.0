@@ -19,35 +19,21 @@ public class SpringConfigClass implements WebApplicationInitializer {
         // Spring MVC 프로젝트 설정을 위해 작성하는 클래스의 객체를 생성
         AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext();
         applicationContext.register(ServletAppContext.class);
-      //  applicationContext.setConfigLocation("com.example.authServerPassword.config");
 
         // 요청 발생 시 요청을 처리하는 서블릿을 DispatcherServlet으로 설정해준다.
         DispatcherServlet dispatcherServlet = new DispatcherServlet(applicationContext);
-        ServletRegistration.Dynamic  servlet = servletContext.addServlet("dispathcherServlet", dispatcherServlet);
+        ServletRegistration.Dynamic  servlet = servletContext.addServlet("dispatcherServlet", dispatcherServlet);
 
         // 부가 설정
         servlet.setLoadOnStartup(1);
         servlet.addMapping("/");
 
         DelegatingFilterProxy filter = new DelegatingFilterProxy("springSecurityFilterChain");
-        DelegatingFilterProxy filter2 = new DelegatingFilterProxy("oauth2ClientContextFilter");
-        filter2.setContextAttribute("org.springframework.web.servlet.FrameworkServlet.CONTEXT.dispatcher");
         filter.setContextAttribute("org.springframework.web.servlet.FrameworkServlet.CONTEXT.dispatcher");
         servletContext.addFilter("springSecurityFilterChain", filter).addMappingForUrlPatterns(null, false, "/*");
-        servletContext.addFilter("oauth2ClientContextFilter", filter2).addMappingForUrlPatterns(null, false, "/*");
-
 
         // Bean을 정의하는 클래스를 지정
         AnnotationConfigWebApplicationContext rootAppContext = new AnnotationConfigWebApplicationContext();
         rootAppContext.register(RootAppContext.class);
-
-        // Listener
-      //  servletContext.addListener(new ContextLoaderListener(applicationContext));
-
-
-        // encodingFilter
-    //    FilterRegistration.Dynamic filterRegistration = servletContext.addFilter("encodingFilter", new CharacterEncodingFilter("UTF-8", true));
-      //  filterRegistration.addMappingForUrlPatterns(null, true, "/*");
-
     }
 }
