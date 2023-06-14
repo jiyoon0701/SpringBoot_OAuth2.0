@@ -54,10 +54,10 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
      */
 
     @Autowired private DataSource dataSource ;
-   // @Autowired@Qualifier("clientDetailsServiceImpl") ClientDetailsService clientDetailsService;
-    @Autowired private ClientDetailsServiceImpl clientDetailsService;
+    @Autowired@Qualifier("clientDetailsServiceImpl") ClientDetailsService clientDetailsService;
     @Autowired private UserDetailsService userDetailsService;
     @Autowired private AuthenticationManager authenticationManager;
+    @Autowired private PasswordEncoder passwordEncoder;
 
     /**
      * AuthorizationServerSecurityConfigurer를 매개변수로 가진 설정 코드
@@ -85,7 +85,8 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                 })
                 .tokenKeyAccess("permitAll()")
                 .checkTokenAccess("isAuthenticated()")
-                .addTokenEndpointAuthenticationFilter(clientCredentialsTokenEndpointFilter());
+                .passwordEncoder(passwordEncoder);
+                //.addTokenEndpointAuthenticationFilter(clientCredentialsTokenEndpointFilter());
     }
 
     @Bean
@@ -94,17 +95,6 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
         filter.setAuthenticationManager(authenticationManager);
         return filter;
     }
-
-
-//    @Bean
-//    public ClientCredentialsTokenEndpointFilter clientCredentialsTokenEndpointFilter() {
-//
-//        ClientCredentialsTokenEndpointFilter filter = new ClientCredentialsTokenEndpointFilter();
-//
-//        filter.setAuthenticationManager(authenticationManager);
-//        return filter;
-//    }
-
 
     /**
      클라이언트에 대한 인증 처리를 위한 설정 - JDBC -> JdbcClientDetailsService
@@ -117,33 +107,8 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
          * userDetailsService는 spring Security에서 유저의 정보를 가져오는 인터페이스이다.
          *
          * */
-        //clients.jdbc().passwordEncoder()
-        System.out.println("-------------------");
-
-       // clients.withClientDetails(clientDetailsService);
-//        clients.jdbc(dataSource);
-//        clients.withClientDetails(clientDetailsService);
-//        System.out.println(clientDetailsService.listClientDetails());
-
-        clients
-                .inMemory()
-                .withClient("bb39b83c-6065-4277-8014-c4eac41f14e2")
-                .secret("e1d69da20a8d342d52e8fa08a1a67ed5d916a6d20df15b8e6f17aaaaf9afbe2e")  // password
-                .redirectUris("http://localhost:9000/callback")
-                .authorizedGrantTypes("authorization_code", "implicit", "password", "client_credentials") // client_credentials 추가
-                .accessTokenValiditySeconds(120)
-                .refreshTokenValiditySeconds(240);
-               //.scopes("read_profile");
-//                .inMemory() // (1)
-//                .withClient("bb39b83c-6065-4277-8014-c4eac41f14e2") //(2)
-//                .secret("e1d69da20a8d342d52e8fa08a1a67ed5d916a6d20df15b8e6f17aaaaf9afbe2e")  //(3) password 9156f2c0-e1f5-4f65-9905-cd6dfe9d0af4
-//                .redirectUris("http://localhost:9000/callback") // (4)
-//                .authorizedGrantTypes("client_credentials") // (5)
-//                .scopes("read_profile"); // (6)
+        clients.withClientDetails(clientDetailsService);
     }
-
-        //clients.jdbc(dataSource).passwordEncoder(passwordEncoder);
-
 
     /**
      * 이 설정은 Authorization Server 설정의 전부라고 해도 무방할 정도로 중요한 설정 메소드이다.
@@ -160,16 +125,16 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
         // 클라이언트 인증 필터를 추가합니다.
         endpoints
                 .authenticationManager(authenticationManager)
+               // .tokenServices(tokenServices())
                 .userDetailsService(userDetailsService) //refresh token 발급을 위해서는 UserDetailsService(AuthenticationManager authenticate()에서 사용)필요
-             //  .tokenServices(tokenServices())
-                .authorizationCodeServices(new JdbcAuthorizationCodeServices(dataSource))
-
+                //  .authorizationCodeServices(new JdbcAuthorizationCodeServices(dataSource))
                 // 1. authorization code를 DB로 관리 코드 테이블의 authentication은 blob데이터타입으로..
                 // 2. client가 얻는 인증코드를 다루는 service 클래스를 등록하는 설정이다.
                 .approvalStore(approvalStore()) //리소스 소유자의 승인을 추가, 검색, 취소하기 위한 메소드를 정의
                 // 1. resource owner가 client app이 resource server에 있는 resource owner의 리소스의 사용을 허락한다는 데이터를 담은 approvalStore를 설정해주는 것
                 .tokenStore(tokenStore()) //토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의
                 .accessTokenConverter(accessTokenConverter());
+               // .setClientDetailsService(clientDetailsService);
     }
     @Bean
     public JwtTokenStore tokenStore() {
@@ -194,21 +159,9 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
         tokenServices.setTokenStore(tokenStore());
         tokenServices.setTokenEnhancer(accessTokenConverter());
         tokenServices.setSupportRefreshToken(true);
-        tokenServices.setClientDetailsService(clientDetailsService());
+        tokenServices.setClientDetailsService(clientDetailsService);
         return tokenServices;
     }
-
-    @Bean
-    public ClientDetailsService clientDetailsService() {
-        // 클라이언트 정보를 데이터베이스에서 관리하는 구현체 설정
-        return new JdbcClientDetailsService(dataSource);
-    }
-
-//    @Bean
-//    public ClientRegistrationService clientRegistrationService() {
-//        // 클라이언트 등록을 처리하는 구현체 설정
-//        return new ClientDetailsServiceImpl(dataSource);
-//    }
 
     /**
      * 새로운 클라이언트 등록을 위한 빈

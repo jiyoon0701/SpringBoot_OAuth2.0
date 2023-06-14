@@ -3,6 +3,7 @@ package com.example.authServerPassword.config;
 import com.example.authServerPassword.Service.UserDetailsServiceImpl;
 import com.example.authServerPassword.security.CustomAuthenticationFailureHandler;
 import com.example.authServerPassword.security.CustomAuthenticationSuccessHandler;
+import com.example.authServerPassword.security.ResourceOwnerAuthenticationFilter;
 import com.example.authServerPassword.utils.ShaPasswordEncoder;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -19,6 +20,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -33,7 +36,6 @@ import java.util.Arrays;
 
 @EnableWebSecurity // 스프링시큐리티 사용을 위한 어노테이션
 @Configuration
-@AllArgsConstructor
 @Log4j
 /**
  * WebSecurityConfigurerAdapter가 Deprecated가 되어 사용할 수 없게 됨.
@@ -41,9 +43,8 @@ import java.util.Arrays;
  */
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-    @Autowired private ShaPasswordEncoder shaPasswordEncoder;
+    @Autowired private UserDetailsService userDetailsService;
+    @Autowired private PasswordEncoder passwordEncoder;
 
     /**
      * AuthenticationProvider 인터페이스는 화면에서 입력한 로그인 정보랑 DB에서 가져온 사용자 정보를 비교해주는 인터페이스
@@ -69,24 +70,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/js/**")
                 .antMatchers("/favicon*/**")
                 .antMatchers("/img/**")
-                .antMatchers("classpath:/static/css/")
-                .antMatchers("/**")
 ;}
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
                 auth.userDetailsService(userDetailsService)
-                .passwordEncoder(shaPasswordEncoder);
+                .passwordEncoder(passwordEncoder);
     }
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(shaPasswordEncoder);
-
-        return authenticationProvider;
-    }
+//    @Bean
+//    public AuthenticationProvider authenticationProvider() {
+//        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+//        authenticationProvider.setUserDetailsService(userDetailsService);
+//        authenticationProvider.setPasswordEncoder(passwordEncoder);
+//
+//        return authenticationProvider;
+//    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -106,11 +105,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/members/login", "/api/members/register","/oauth/token").permitAll()
+                .antMatchers("/api/members/login", "/api/members/register").permitAll()
                 .antMatchers("/error**").permitAll()
                 .anyRequest().authenticated()
                 .and().csrf()
                 .disable()
+                .addFilter(authenticationFilter())
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint())
                 .accessDeniedHandler((request,response,exception)->{
@@ -127,6 +127,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/login")//로그인 Form Action Url
                 .successHandler(authenticationSuccessHandler())
                 .failureHandler(authenticationFailureHandler());
+    }
+
+    @Bean
+    public ResourceOwnerAuthenticationFilter authenticationFilter() throws Exception {
+        ResourceOwnerAuthenticationFilter filter = new ResourceOwnerAuthenticationFilter(authenticationManager());
+        filter.setFilterProcessesUrl("/login");
+        filter.setUsernameParameter("username");
+        filter.setPasswordParameter("password");
+
+        filter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
+        filter.setAuthenticationFailureHandler(authenticationFailureHandler());
+
+        filter.afterPropertiesSet();
+
+        return filter;
     }
 
     @Bean
