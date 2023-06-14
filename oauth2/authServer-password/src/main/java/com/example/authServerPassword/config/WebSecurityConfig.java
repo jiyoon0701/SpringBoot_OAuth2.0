@@ -4,6 +4,7 @@ import com.example.authServerPassword.security.CustomAuthenticationFailureHandle
 import com.example.authServerPassword.security.CustomAuthenticationSuccessHandler;
 import com.example.authServerPassword.security.ResourceOwnerAuthenticationFilter;
 import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +31,7 @@ import java.util.Arrays;
 
 @EnableWebSecurity // 스프링시큐리티 사용을 위한 어노테이션
 @Configuration
-@Log4j
+@Slf4j
 /**
  * WebSecurityConfigurerAdapter가 Deprecated가 되어 사용할 수 없게 됨.
  * 공식문서에 따라 SecurityFilterChain을 Bean으로 등록해서 사용
@@ -90,12 +91,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/members/login", "/api/members/register").permitAll()
+                .antMatchers("/members/login", "/members/register").permitAll()
                 .antMatchers("/error**").permitAll()
                 .anyRequest().authenticated()
                 .and().csrf()
                 .disable()
-                .addFilter(authenticationFilter())
+                //.addFilter(authenticationFilter())
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint())
                 .accessDeniedHandler((request,response,exception)->{
@@ -103,7 +104,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     response.setHeader("Cache-Control", "no-cache");
                     PrintWriter writer = response.getWriter();
                     writer.println(new AccessDeniedException("access denied !"));
-                });
+                })
+                .and()
+                .formLogin()
+                .usernameParameter("username")
+                .passwordParameter("password")//패스워드 파라미터명 설정
+                .loginProcessingUrl("/login")//로그인 Form Action Url
+                .successHandler(authenticationSuccessHandler())
+                .failureHandler(authenticationFailureHandler());
     }
 
     @Bean
@@ -124,21 +132,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         CustomAuthenticationSuccessHandler successHandler = new CustomAuthenticationSuccessHandler();
-        successHandler.setDefaultTargetUrl("/api/client/dashboard");
+        log.info("WebSecurityConfig :::: successHandler");
+        successHandler.setDefaultTargetUrl("/client/dashboard");
         return successHandler;
     }
 
     @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {
         CustomAuthenticationFailureHandler failureHandler = new CustomAuthenticationFailureHandler();
-        failureHandler.setDefaultFailureUrl("/api/members/login?error=loginfail");
+        failureHandler.setDefaultFailureUrl("/members/login?error=loginfail");
 
         return failureHandler;
     }
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
-        return new LoginUrlAuthenticationEntryPoint("/api/members/login");
+        return new LoginUrlAuthenticationEntryPoint("/members/login");
     }
 }
 

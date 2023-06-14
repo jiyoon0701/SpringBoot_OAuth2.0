@@ -1,11 +1,12 @@
 package com.example.authServerPassword.config;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,15 +20,12 @@ import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationService;
 import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 
 @Configuration
-@AllArgsConstructor
 @Log4j
 @EnableAuthorizationServer
 
@@ -36,17 +34,21 @@ import java.io.PrintWriter;
  * Authorization을 발급하는 서버로 지정되며, 해당 어노테이션을 붙이는 것만으로도 OAuth관련 endPoints가 생성된다.
  * (/oauth/token, /oauth/authorize 등)
  */
-
+@PropertySource(value = "classpath:jwt.properties")
 public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     /**
      * 모든 메서드를 포함한 구현체 -> AuthorizationServerConfigurerAdapter이기 때문에 상속을 받으면 편리하다.
      */
+
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
     @Autowired private DataSource dataSource ;
     @Autowired@Qualifier("clientDetailsServiceImpl") ClientDetailsService clientDetailsService;
     @Autowired private UserDetailsService userDetailsService;
     @Autowired private AuthenticationManager authenticationManager;
     @Autowired private PasswordEncoder passwordEncoder;
+
 
     /**
      * AuthorizationServerSecurityConfigurer를 매개변수로 가진 설정 코드
@@ -129,7 +131,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey("non-prod-signature");
+        converter.setSigningKey(jwtSecret);
 
         return converter;
     }

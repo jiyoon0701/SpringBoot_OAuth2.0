@@ -17,3 +17,7 @@ oauth2/clientServer/src/main/resources/static
 
 oauth2/authServer-code/src/main/resources/static
 oauth2/clientServer/clientServer.iml
+
+oauth2/authServer-password/src/main/resources/jdbc.properties
+
+oauth2/authServer-password/src/main/resources/jwt.properties

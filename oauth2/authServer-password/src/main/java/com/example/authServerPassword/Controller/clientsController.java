@@ -1,5 +1,6 @@
 package com.example.authServerPassword.Controller;
 
+import java.util.*;
 import com.example.authServerPassword.Domain.Client;
 import com.example.authServerPassword.Domain.ClientDto;
 import com.example.authServerPassword.Service.ClientDetailsServiceImpl;
@@ -18,7 +19,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 @Controller
-@RequestMapping("/api/client")
+@RequestMapping("/client")
 public class clientsController {
     @Autowired
     private ClientDetailsServiceImpl clientRegistrationService;
@@ -49,8 +50,13 @@ public class clientsController {
     public ModelAndView save(ClientDto clientDetails, ModelAndView mav , BindingResult bindingResult) {
 
         if(bindingResult.hasErrors()) {
-            return new ModelAndView("/api/client/register");
+            return new ModelAndView("/client/register");
         }
+
+        Collection<String> grant = new ArrayList<String>();
+        grant.add("password");
+        grant.add("client_credentials");
+        grant.add("refresh_token");
         String randomId = UUID.randomUUID().toString();
         String randomSecret = UUID.randomUUID().toString();
 
@@ -60,13 +66,14 @@ public class clientsController {
         client.addAdditionalInformation("name", clientDetails.getName());
         client.setRegisteredRedirectUri(new HashSet<>(Arrays.asList(clientDetails.getRedirectUri().toString())));
         client.setClientType(ClientType.PUBLIC);
+        client.setAuthorizedGrantTypes(grant);
         client.setClientId(randomId);
         client.setClientSecret(passwordEncoder.encode(randomSecret));
         client.setAccessTokenValiditySeconds(3600);
         client.setScope(Arrays.asList("read","write"));
         clientRegistrationService.addClientDetails(client);
 
-        mav.setViewName("redirect:/api/client/dashboard");
+        mav.setViewName("redirect:/client/dashboard");
         mav.addObject("clientId", randomId);
         mav.addObject("clientSecret", randomSecret);
         mav.addObject("name", name);
@@ -75,13 +82,14 @@ public class clientsController {
         return mav;
     }
 
+
     @GetMapping("/remove")
     public ModelAndView remove(
             @RequestParam(value = "client_id", required = false) String clientId) {
 
         clientRegistrationService.removeClientDetails(clientId);
 
-        ModelAndView mv = new ModelAndView("redirect:/api/client/dashboard");
+        ModelAndView mv = new ModelAndView("redirect:/client/dashboard");
         mv.addObject("applications", clientRegistrationService.listClientDetails());
         return mv;
     }

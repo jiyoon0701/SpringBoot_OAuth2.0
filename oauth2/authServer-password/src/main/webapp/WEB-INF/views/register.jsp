@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입 화면 샘플 - Bootstrap</title>
+    <title>OAuth2.0</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -43,35 +43,35 @@
 <div class="container">
     <div class="input-form-backgroud row">
         <div class="input-form col-md-12 mx-auto">
-            <h4 class="mb-3">플랫폼 회원가입(Google, FaceBook, ...) </h4>
-            <form class="validation-form" action="/api/members/register" method="post" novalidate>
+            <h4 class="mb-3">SignUp</h4>
+            <form class="validation-form" action="/members/register" method="post" novalidate>
                 <div class="mb-3">
-                    <label for="name">이름</label>
+                    <label for="name">nickname</label>
                     <input type="text" class="form-control" id="name" name = "nickname" required>
                     <div class="invalid-feedback">
-                        이름을 입력해주세요.
+                        Enter Nickname
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="email">이메일</label>
+                    <label for="email">email</label>
                     <input type="email" class="form-control" id="email" name = "username" placeholder="you@example.com" required>
                     <div class="invalid-feedback">
-                        이메일을 입력해주세요.
+                       Enter Email
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="password">비밀번호</label>
+                    <label for="password">password</label>
                     <input type="password" class="form-control" id="password" name = "password" required>
                     <div class="invalid-feedback">
-                        비밀번호를 입력해주세요.
+                        Enter Password
                     </div>
                 </div>
                 <hr class="mb-4">
 
                 <div class="mb-4"></div>
-                <button class="btn btn-primary btn-lg btn-block" type="submit">가입 완료</button>
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Sign Up</button>
             </form>
         </div>
     </div>
