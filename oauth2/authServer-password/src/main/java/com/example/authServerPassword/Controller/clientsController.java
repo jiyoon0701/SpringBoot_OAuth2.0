@@ -4,9 +4,6 @@ import com.example.authServerPassword.Domain.Client;
 import com.example.authServerPassword.Domain.ClientDto;
 import com.example.authServerPassword.Service.ClientDetailsServiceImpl;
 import com.example.authServerPassword.constrant.ClientType;
-import com.example.authServerPassword.utils.Crypto;
-import com.example.authServerPassword.utils.ShaPasswordEncoder;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -25,7 +22,8 @@ import java.util.UUID;
 public class clientsController {
     @Autowired
     private ClientDetailsServiceImpl clientRegistrationService;
-    @Autowired private ShaPasswordEncoder passwordEncoder;
+    @Autowired private PasswordEncoder passwordEncoder;
+
     @GetMapping("/register")
     public ModelAndView registerPage(ModelAndView mav) {
         mav.setViewName("client/register");
@@ -34,16 +32,12 @@ public class clientsController {
     }
 
     @GetMapping("/dashboard")
-    public ModelAndView dashboard(@ModelAttribute("clientId")String clientId
-            ,@ModelAttribute("clientSecret")String clientSecret
-             , @ModelAttribute("name")String name
-                                  ,@ModelAttribute("clientType")String clientType
+    public ModelAndView dashboard(@ModelAttribute("clientId")String clientId, @ModelAttribute("clientSecret")String clientSecret, @ModelAttribute("name")String name
+            , @ModelAttribute("clientType")String clientType
             , ModelAndView mv) {
 
-
         if(!StringUtils.isEmpty(clientId)) {
-            mv.addObject("applications",
-                    clientRegistrationService.loadClientByClientId(clientId));
+            mv.addObject("applications", clientRegistrationService.loadClientByClientId(clientId));
             mv.addObject("client_secret", clientSecret);
         }
         mv.setViewName("client/dashboard");
@@ -61,14 +55,12 @@ public class clientsController {
         String randomSecret = UUID.randomUUID().toString();
 
         String name = clientDetails.getName();
-        System.out.println();
 
         Client client = new Client();
         client.addAdditionalInformation("name", clientDetails.getName());
         client.setRegisteredRedirectUri(new HashSet<>(Arrays.asList(clientDetails.getRedirectUri().toString())));
         client.setClientType(ClientType.PUBLIC);
         client.setClientId(randomId);
-    //    client.setClientSecret(Crypto.sha256(randomSecret));
         client.setClientSecret(passwordEncoder.encode(randomSecret));
         client.setAccessTokenValiditySeconds(3600);
         client.setScope(Arrays.asList("read","write"));
@@ -87,11 +79,10 @@ public class clientsController {
     public ModelAndView remove(
             @RequestParam(value = "client_id", required = false) String clientId) {
 
-      clientRegistrationService.removeClientDetails(clientId);
+        clientRegistrationService.removeClientDetails(clientId);
 
         ModelAndView mv = new ModelAndView("redirect:/api/client/dashboard");
-        mv.addObject("applications",
-        clientRegistrationService.listClientDetails());
+        mv.addObject("applications", clientRegistrationService.listClientDetails());
         return mv;
     }
 }

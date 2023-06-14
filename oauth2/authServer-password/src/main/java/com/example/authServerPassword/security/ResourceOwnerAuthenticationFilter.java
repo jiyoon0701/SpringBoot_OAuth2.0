@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Resource Owner Form Login Filter
- * @author yun-yeoseong
  *
  */
 @Slf4j

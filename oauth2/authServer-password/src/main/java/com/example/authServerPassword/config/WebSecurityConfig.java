@@ -1,19 +1,14 @@
 package com.example.authServerPassword.config;
 
-import com.example.authServerPassword.Service.UserDetailsServiceImpl;
 import com.example.authServerPassword.security.CustomAuthenticationFailureHandler;
 import com.example.authServerPassword.security.CustomAuthenticationSuccessHandler;
 import com.example.authServerPassword.security.ResourceOwnerAuthenticationFilter;
-import com.example.authServerPassword.utils.ShaPasswordEncoder;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,7 +24,6 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.io.PrintWriter;
 import java.util.Arrays;
 
@@ -78,15 +72,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(passwordEncoder);
     }
 
-//    @Bean
-//    public AuthenticationProvider authenticationProvider() {
-//        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-//        authenticationProvider.setUserDetailsService(userDetailsService);
-//        authenticationProvider.setPasswordEncoder(passwordEncoder);
-//
-//        return authenticationProvider;
-//    }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -118,15 +103,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     response.setHeader("Cache-Control", "no-cache");
                     PrintWriter writer = response.getWriter();
                     writer.println(new AccessDeniedException("access denied !"));
-                })
-                .and()
-                .formLogin()
-                .loginPage("/login.html")
-                .usernameParameter("username")//아이디 파라미터명 설정
-                .passwordParameter("password")//패스워드 파라미터명 설정
-                .loginProcessingUrl("/login")//로그인 Form Action Url
-                .successHandler(authenticationSuccessHandler())
-                .failureHandler(authenticationFailureHandler());
+                });
     }
 
     @Bean
