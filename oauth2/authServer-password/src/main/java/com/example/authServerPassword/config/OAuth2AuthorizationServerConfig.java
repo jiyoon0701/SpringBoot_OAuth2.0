@@ -20,6 +20,8 @@ import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationService;
 import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import javax.sql.DataSource;
@@ -75,7 +77,8 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                 })
                 .tokenKeyAccess("permitAll()")
                 .checkTokenAccess("isAuthenticated()")
-                .passwordEncoder(passwordEncoder);
+                .passwordEncoder(passwordEncoder)
+                .allowFormAuthenticationForClients();
     }
 
     /**
@@ -112,10 +115,8 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                 // 2. client가 얻는 인증코드를 다루는 service 클래스를 등록하는 설정이다.
                 .approvalStore(approvalStore()) //리소스 소유자의 승인을 추가, 검색, 취소하기 위한 메소드를 정의
                 // 1. resource owner가 client app이 resource server에 있는 resource owner의 리소스의 사용을 허락한다는 데이터를 담은 approvalStore를 설정해주는 것
-                .tokenStore(tokenStore()) //토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의 - jwt
-                .accessTokenConverter(accessTokenConverter());
-
-                //.tokenStore(tokenStore(dataSource)); //토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의 - accessToken
+                //.tokenStore(tokenStore()) //토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의 - jwt
+                .tokenStore(tokenStore(dataSource)) ;//토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의 - accessToken
                // .accessTokenConverter(accessTokenConverter());
     }
 
@@ -123,10 +124,10 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
      * jwt 발급 시 필요코드
      * @return
      */
-    @Bean
+    /*@Bean
     public JwtTokenStore tokenStore() {
         return new JwtTokenStore(accessTokenConverter());
-    }
+    }*/
 
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
@@ -139,12 +140,10 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     /**
      *  accessToken 발급 시 필요 코드
      */
-    /*
     @Bean
     public TokenStore tokenStore(DataSource dataSource) {
         return new JdbcTokenStore(dataSource);
     }
-    */
 
     @Bean
     public JdbcApprovalStore approvalStore() {
