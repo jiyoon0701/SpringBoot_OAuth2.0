@@ -61,6 +61,8 @@ public class clientsController {
         String randomSecret = UUID.randomUUID().toString();
 
         String name = clientDetails.getName();
+        // token_type : access : 0 (false)
+        //              jwt : 1 (true)
 
         Client client = new Client();
         client.addAdditionalInformation("name", clientDetails.getName());
@@ -68,6 +70,7 @@ public class clientsController {
         client.setClientType(ClientType.PUBLIC);
         client.setAuthorizedGrantTypes(grant);
         client.setClientId(randomId);
+        client.setTokenType(false);
         client.setClientSecret(passwordEncoder.encode(randomSecret));
         client.setAccessTokenValiditySeconds(3600);
         client.setScope(Arrays.asList("read","write"));

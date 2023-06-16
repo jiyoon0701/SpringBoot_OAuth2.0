@@ -16,5 +16,7 @@ public class ClientDto {
 	private String redirectUri;
 	private String clientType;
 	private String email;
+	private Boolean token_type;
 	private String grantType;
+
 }

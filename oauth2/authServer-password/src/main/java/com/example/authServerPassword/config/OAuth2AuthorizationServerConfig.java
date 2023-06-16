@@ -1,6 +1,7 @@
 package com.example.authServerPassword.config;
 
 import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,17 +10,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationService;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
+import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
@@ -28,9 +35,9 @@ import javax.sql.DataSource;
 import java.io.PrintWriter;
 
 @Configuration
-@Log4j
+//@Log4j
 @EnableAuthorizationServer
-
+@Slf4j
 /**
  * @EnableAuthorizationServer
  * Authorization을 발급하는 서버로 지정되며, 해당 어노테이션을 붙이는 것만으로도 OAuth관련 endPoints가 생성된다.
@@ -50,7 +57,6 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     @Autowired private UserDetailsService userDetailsService;
     @Autowired private AuthenticationManager authenticationManager;
     @Autowired private PasswordEncoder passwordEncoder;
-
 
     /**
      * AuthorizationServerSecurityConfigurer를 매개변수로 가진 설정 코드
@@ -93,6 +99,7 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
          *
          * */
         clients.withClientDetails(clientDetailsService);
+        clients.configure(new ClientDetailsServiceBuilder<>());
     }
 
     /**
@@ -106,6 +113,9 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
      * */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+
+
+        log.info("Configure token_type Check :::::::::{}", getClientId());
         // 클라이언트 인증 필터를 추가합니다.
         endpoints
                 .authenticationManager(authenticationManager)
@@ -116,8 +126,8 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                 .approvalStore(approvalStore()) //리소스 소유자의 승인을 추가, 검색, 취소하기 위한 메소드를 정의
                 // 1. resource owner가 client app이 resource server에 있는 resource owner의 리소스의 사용을 허락한다는 데이터를 담은 approvalStore를 설정해주는 것
                 //.tokenStore(tokenStore()) //토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의 - jwt
-                .tokenStore(tokenStore(dataSource)) ;//토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의 - accessToken
-               // .accessTokenConverter(accessTokenConverter());
+                .tokenStore(tokenStore(dataSource)); //토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의 - accessToken
+                //.accessTokenConverter(accessTokenConverter());
     }
 
     /**
@@ -136,6 +146,18 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
 
         return converter;
     }
+
+    // token type 반환
+
+    public String getClientId() {
+        Authentication a = SecurityContextHolder.getContext().getAuthentication
+       ();
+        if (!(a instanceof OAuth2Authentication)) {
+            return null;
+        }
+        return ((OAuth2Authentication) a).getOAuth2Request().getClientId();
+    }
+
 
     /**
      *  accessToken 발급 시 필요 코드

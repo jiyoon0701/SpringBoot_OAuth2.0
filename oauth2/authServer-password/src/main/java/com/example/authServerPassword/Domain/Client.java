@@ -12,9 +12,17 @@ public class Client extends BaseClientDetails{
 	@Getter
 	private ClientType clientType;
 
+	@Getter
+	private Boolean tokenType;
+
 	public void setClientType(ClientType clientType) {
 		this.clientType = clientType;
 		this.addAdditionalInformation("client_type", clientType.name());
+	}
+
+	public void setTokenType(Boolean tokenType) {
+		this.tokenType = tokenType;
+		this.addAdditionalInformation("token_type", tokenType);
 	}
 
 }
