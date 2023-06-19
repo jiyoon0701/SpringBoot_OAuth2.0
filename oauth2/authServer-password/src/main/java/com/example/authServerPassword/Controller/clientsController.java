@@ -66,7 +66,7 @@ public class clientsController {
 
         Client client = new Client();
         client.addAdditionalInformation("name", clientDetails.getName());
-        client.setRegisteredRedirectUri(new HashSet<>(Arrays.asList(clientDetails.getRedirectUri().toString())));
+        //client.setRegisteredRedirectUri(new HashSet<>(Arrays.asList(clientDetails.getRedirectUri().toString())));
         client.setClientType(ClientType.PUBLIC);
         client.setAuthorizedGrantTypes(grant);
         client.setClientId(randomId);
