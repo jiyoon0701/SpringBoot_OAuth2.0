@@ -58,6 +58,11 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     @Autowired private AuthenticationManager authenticationManager;
     @Autowired private PasswordEncoder passwordEncoder;
 
+    @Autowired private TokenEnhancer tokenEnhancer;
+
+    @Autowired
+    private TokenStore tokenStore;
+
     /**
      * AuthorizationServerSecurityConfigurer를 매개변수로 가진 설정 코드
      * 해당 메소드에서 설정하는 것은 AuthenticationEntryPoint, AccessDeniedHandler, PasswordEncoder등을 설정할 수 있는 메소드
@@ -85,6 +90,13 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                 .checkTokenAccess("isAuthenticated()")
                 .passwordEncoder(passwordEncoder)
                 .allowFormAuthenticationForClients();
+    }
+
+    @Bean
+    public CustomTokenServices customTokenServices() {
+        CustomTokenServices tokenServices = new CustomTokenServices(tokenStore, tokenEnhancer, clientDetailsService);
+        tokenServices.setTokenStore(tokenStore);
+        return tokenServices;
     }
 
     /**
@@ -124,9 +136,10 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
                 // 1. authorization code를 DB로 관리 코드 테이블의 authentication은 blob데이터타입으로..
                 // 2. client가 얻는 인증코드를 다루는 service 클래스를 등록하는 설정이다.
                 .approvalStore(approvalStore()) //리소스 소유자의 승인을 추가, 검색, 취소하기 위한 메소드를 정의
+                .tokenServices(customTokenServices());
                 // 1. resource owner가 client app이 resource server에 있는 resource owner의 리소스의 사용을 허락한다는 데이터를 담은 approvalStore를 설정해주는 것
                 //.tokenStore(tokenStore()) //토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의 - jwt
-                .tokenStore(tokenStore(dataSource)); //토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의 - accessToken
+              //  .tokenStore(tokenStore(dataSource)); //토큰과 관련된 인증 데이터를 저장, 검색, 제거, 읽기를 정의 - accessToken
                 //.accessTokenConverter(accessTokenConverter());
     }
 
